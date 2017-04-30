@@ -265,24 +265,6 @@ public class Soldier
     private Healing ApplyHealingModifiersBySource(Healing baseHealing, Caster caster, HEALSOURCE source)
     {
         Healing newHealing = baseHealing;
-        if (source == HEALSOURCE.SCROLL_OF_RENEW)
-        {
-            newHealing.value = (int)(maxHealth * 0.5f);
-            return newHealing;
-        }
-
-        if (source == HEALSOURCE.SHADOWSONG)
-        {
-            if (caster.myTalentTree.GetTalentByName("Shadowmend").Points > 0)
-            {
-                Buff myb = effectSystem.FindBuff((int)Buff.DB.SOOTHING_VOID);
-                if (myb != null)
-                {
-                    newHealing.value = (int)(newHealing.value + newHealing.value * caster.myTalentTree.GetTalentByName("Shadowmend").Points * 0.2f);
-                    return newHealing;
-                }
-            }
-        }
 
         return newHealing;
     }
@@ -340,7 +322,7 @@ public class Soldier
             {
                 if ((source != HEALSOURCE.GUIDANCE_OF_RAELA) && (source != HEALSOURCE.WOK_LOYALTY))
                 {
-                    core.CastAutoSpell((int)SPELL.GUIDANCE_OF_RAELA, null, overheal_value, overheal_value);
+                    core.CastAutoSpell((int)SPELL.GUIDANCE_OF_RAELA, null, overheal_value);
                     return 0;
                 }
             }
@@ -364,25 +346,39 @@ public class Soldier
         frame.GetComponent<scrUnitPanel>().RefreshHealthInfo();
     }
 
-    public Healing Heal(int minh, int maxh, float critchance, Caster _caster, SpellInfo info, HEALSOURCE source, HEALTYPE healtype)
+    public void SpawnEffect(GameObject VFX)
+    {
+        GameObject.Instantiate(VFX, frame.transform.position + new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
+    }
+
+    public Healing Heal(Caster _caster, SpellInfo info, HEALSOURCE source, HEALTYPE healtype)
+    {
+        return ApplyHeal(_caster, info.baseValue + (int)(info.coeff * _caster.GetPower()), _caster.GetCritChance(), source, healtype);
+    }
+
+    public Healing Heal(Caster _caster, int val, float crit, HEALSOURCE source, HEALTYPE healtype)
+    {
+        return ApplyHeal(_caster, val, crit, source, healtype);
+    }
+
+    private Healing ApplyHeal(Caster _caster, int val, float crit, HEALSOURCE source, HEALTYPE healtype)
     {
         if (!isDead)
         {
             Healing myHeal = new Healing(0, false, healtype);
-                   
-            myHeal = CalculateHealing(minh, maxh, critchance, healtype);
+
+            myHeal = CalculateHealing(val, crit, healtype);
             myHeal.value = (int)(myHeal.value * _caster.HealingMultiplier());
             myHeal.value = (int)(myHeal.value * healingTakenBoost);
 
-            myHeal = ApplyHealingModifiersBySource(myHeal, _caster, source);
-
-            LogHealing((int)myHeal.value, myHeal.isCrit);
+            myHeal = ApplyHealingModifiersBySource(myHeal, _caster, source);            
 
             WoKLoyaltyBeaconHealing(myHeal, source, healtype);
 
             myHeal = ApplyHealingModifiersByBuff(source, myHeal);
 
             float heal_value = Mathf.Min(myHeal.value, maxHealth - health);
+            heal_value += heal_value * Random.Range(95f, 105f) / 100f;
             int overheal_value = 0;
             overheal_value = Mathf.Max(0, (int)((myHeal.value + health) - maxHealth));
 
@@ -397,20 +393,17 @@ public class Soldier
             CriticalHealTrigger(myHeal);
 
             UpdateHealthBar();
+
+            LogHealing((int)heal_value, myHeal.isCrit);
             return myHeal;
         }
         return null;
     }
 
-    private Healing CalculateHealing(int minh, int maxh, float critchance, HEALTYPE healtype)
+    private Healing CalculateHealing(int value, float critchance, HEALTYPE healtype)
     {
-        int value = 0;
         bool isCrit = false;
 
-        if (minh != maxh)
-            value = Random.Range(minh, maxh);
-        else
-            value = minh;
         if (critchance > 0)
         {
             if (Random.Range(0, 100) < critchance)
@@ -424,9 +417,9 @@ public class Soldier
         return myHeal;
     }
 
-    private void LogHealing(float value, bool isCrit, int type = 0)
+    private void LogHealing(int value, bool isCrit, int type = 0)
     {
-        if ((value > 10) && (health + 10 < maxHealth))
+        if (value > 10)
         {
             float posx;
             Color mycolor;
@@ -441,30 +434,27 @@ public class Soldier
                     break;
                 case 1:
                     {
-                        posx = 0.3f;
+                        posx = 0.1f;
                         mycolor = Color.white; // absorb
                     }
                     break;
                 default:
                     {
-                        posx = 0.3f;
+                        posx = 0.1f;
                         mycolor = Color.green;  // healing
                     }
                     break;
             }
 
-            if (value > 0)
+            if (frame != null)
             {
-                if (frame != null)
-                {
-                    GameObject myLog = Object.Instantiate(Resources.Load("CombatText"), frame.transform.position + new Vector3(posx, 0, -2), frame.transform.rotation) as GameObject;
-                    myLog.GetComponent<Text>().text = value.ToString();
-                    myLog.GetComponent<Text>().color = mycolor;
+                GameObject myLog = Object.Instantiate(Resources.Load("CombatText"), frame.transform.position + new Vector3(posx, 0, -2), frame.transform.rotation) as GameObject;
+                myLog.GetComponent<Text>().text = value.ToString();
+                myLog.GetComponent<Text>().color = mycolor;
 
-                    myLog.GetComponent<CombatLogScript>().isCrit = isCrit;
-                }
+                myLog.GetComponent<CombatLogScript>().isCrit = isCrit;
             }
-            core.AddHealing(value);
+
         }
     }
     //******************************************** KONIEC HEALING ******************************************** \\
@@ -579,9 +569,9 @@ public class Soldier
         }
     }
 
-    public void CastFinished(SpellEffect mySpell, Caster _caster, int minval = 0, int maxval = 0)
+    public void CastFinished(SpellEffect mySpell, Caster _caster, int val=0)
     {
-        mySpell.OnCastFinished(_caster, this, minval, maxval);
+        mySpell.OnCastFinished(_caster, this, val);
     }
 }
 

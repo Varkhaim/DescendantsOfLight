@@ -58,7 +58,7 @@ public class Recount
             case HEALSOURCE.SHADOWSURGE: return "Shadowsurge";
             case HEALSOURCE.ROYALTY: return "Royalty";
             case HEALSOURCE.GUIDANCE_OF_RAELA: return "Guidance of Raela";
-            case HEALSOURCE.SCROLL_OF_RENEW: return "Scroll of Renew";
+            case HEALSOURCE.SCROLL_OF_ALAPHI: return "Scroll of Renew";
             default: return "_MISSING_";
         }
     }

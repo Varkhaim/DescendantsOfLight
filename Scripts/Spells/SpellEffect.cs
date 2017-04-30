@@ -12,12 +12,12 @@ public class SpellEffect
         // co sie dzieje w momencie zaczecia castowania
     }
 
-    public virtual void OnCastFinished(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public virtual void OnCastFinished(Caster who, Soldier target, int val = 0)
     {
         // co sie dzieje w momencie wycastowania
     }
 
-    public virtual void Execute(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public virtual void Execute(Caster who, Soldier target, int val = 0)
     {
         // wlasciwy efekt spella
     }

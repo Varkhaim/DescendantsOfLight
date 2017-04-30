@@ -92,10 +92,10 @@ public class Spell
         }
     }*/
 
-    public static void Cast(SpellEffect _meffect, Soldier _target, Caster _caster, int minval = 0, int maxval = 0)
+    public static void Cast(SpellEffect _meffect, Soldier _target, Caster _caster, int val=0)
     {
         if (!_target.isDead)
-        _meffect.Execute(_caster, _target, minval, maxval);
+        _meffect.Execute(_caster, _target, val);
     }
 
     // KONIEC STATYCZNYCH

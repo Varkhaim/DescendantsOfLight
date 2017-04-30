@@ -27,21 +27,18 @@ public class WordOfKingsCourage : SpellEffect
         //    target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/WoKCourageSound"));
     }
 
-    public override void OnCastFinished(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void OnCastFinished(Caster who, Soldier target, int val=0)
     {
         Spell.Cast(this, target, who);
     }
 
-    public override void Execute(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void Execute(Caster who, Soldier target, int val=0)
     {
-        int _value = 0;
         SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.WORD_OF_KINGS_COURAGE);
-        _value = spellInfo.baseValue;
-        _value += (int)(GameCore.Core.chosenAccount.statPWR * spellInfo.coeff);
 
         //Object.Instantiate(Resources.Load("Visuals/WoKCourageParticle"), target.frame.transform.position + new Vector3(1.4f, -0.5f), Quaternion.Euler(270, 0, 0));
 
-        target.Heal(_value, _value + 15, GameCore.Core.criticalStrikeChance, who, spellInfo, HEALSOURCE.WOK_COURAGE, spellInfo.healtype);
+        target.Heal(who, spellInfo, HEALSOURCE.WOK_COURAGE, spellInfo.healtype);
 
         GameObject.Instantiate(Resources.Load("Animations/lightexplosion_0"), target.frame.transform.position + new Vector3(0, 0.35f, 0), Quaternion.Euler(0, 0, 0));
     }

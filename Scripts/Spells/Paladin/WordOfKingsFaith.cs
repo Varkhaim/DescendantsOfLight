@@ -22,12 +22,12 @@ public class WordOfKingsFaith : SpellEffect
         target.CastFinished(this, who);
     }
 
-    public override void OnCastFinished(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void OnCastFinished(Caster who, Soldier target, int val=0)
     {
         Spell.Cast(this, target, who);
     }
 
-    public override void Execute(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void Execute(Caster who, Soldier target, int val = 0)
     {
         SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.WORD_OF_KINGS_FAITH);
         int _dur = (int)(spellInfo.ticksCount * spellInfo.HoTgap / (1f+who.myAura[(int)AURA.EMPATHY].stacks*VALUES.EMPATHY_PERCENT2));

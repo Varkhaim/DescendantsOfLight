@@ -7,6 +7,12 @@ public class Caster
     public GameCore core = GameCore.Core;
     public Aura[] myAura = new Aura[100];
 
+    private int basestatINT = 10; // INTelligence - redukuje cooldown spelli o x%
+    private int basestatKNG = 10; // KNowledGe - zwieksza regen many o x%
+    private int basestatFCS = 10; // FoCuS - zwieksza szanse na krytyczne uderzenie o x%
+    private int basestatPWR = 10; // PoWeR - zwieksza sile leczenia o x%
+    private float critChance = 0f;
+
     public float HealingMultiplier()
     {
         float _value = 1f;
@@ -39,10 +45,25 @@ public class Caster
         return myAura[(int)which].stacks;
     }
 
-    public Caster(TalentTree _tree)
+    public Caster(TalentTree _tree, Account _acc)
     {
         myTalentTree = _tree;
         ApplyAurasFromTree(_tree);
+        CopyStats(_acc);
+        RefreshStats();
+    }
+
+    private void CopyStats(Account _acc)
+    {
+        basestatFCS = _acc.statFCS;
+        basestatINT = _acc.statINT;
+        basestatKNG = _acc.statKNG;
+        basestatPWR = _acc.statPWR;
+    }
+
+    public void RefreshStats()
+    {
+        critChance = 2 * basestatFCS / (2 * basestatFCS + 1000);
     }
 
     private void ApplyAurasFromTree(TalentTree _tree)
@@ -71,6 +92,16 @@ public class Caster
                 }
                 break;
         }
+    }
+
+    public float GetCritChance()
+    {
+        return critChance;
+    }
+
+    public float GetPower()
+    {
+        return basestatPWR;
     }
 }
 

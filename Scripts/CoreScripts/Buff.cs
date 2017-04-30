@@ -67,26 +67,6 @@ public class Buff
 
     public void Remove()
     {
-        if (ID == (int)DB.SOOTHING_VOID)
-        {
-            if (refreshCount == 0)
-            {
-                if (!myParent.isDead)
-                {
-                    int _points = myCaster.myTalentTree.GetTalentPointsByName("Fading Light");
-                    if (_points > 0)
-                    {
-                        SpellInfo _ws = GameCore.Core.spellRepository.Get(SPELL.SOOTHING_VOID);
-                        int _value = 0;
-                        _value = _ws.baseValue;
-                        _value += (int)(GameCore.Core.chosenAccount.statPWR * _ws.coeff);
-                        _value *= (int)(_points * 0.2f);
-
-                        myParent.Heal(_value, _value + 5, GameCore.Core.criticalStrikeChance, myCaster, _ws, HEALSOURCE.FADING_LIGHT, HEALTYPE.OTHER);
-                    }
-                }
-            }
-        }
         if (ID ==(int)DB.WORD_OF_KINGS_LOYALTY)
         {
             GameCore.Core.RemoveBeaconedTarget(myParent);
@@ -132,7 +112,7 @@ public class Buff
                 break;
             case (int)Buff.DB.WORD_OF_KINGS_FAITH:
                 {
-                    Healing temp = myParent.Heal((int)(_value * multiplier), (int)((_value + 6) * multiplier), GameCore.Core.criticalStrikeChance, myCaster, spellInfo, HEALSOURCE.WOK_FAITH, HEALTYPE.PERIODIC_SINGLE);
+                    Healing temp = myParent.Heal(myCaster, spellInfo, HEALSOURCE.WOK_FAITH, HEALTYPE.PERIODIC_SINGLE);
                     if (temp.isCrit)
                     {
                         if (myCaster.myAura[(int)AURA.DIVINITY].isActive)
@@ -147,12 +127,12 @@ public class Buff
                 break;
             case (int)Buff.DB.SHADOWMEND:
                 {
-                    myParent.Heal(minv, maxv, 0, myCaster, spellInfo, HEALSOURCE.SHADOWMEND, HEALTYPE.PERIODIC_MULTI);
+                    myParent.Heal(myCaster, spellInfo, HEALSOURCE.SHADOWMEND, HEALTYPE.PERIODIC_MULTI);
                 }
                 break;
             case (int)Buff.DB.SOOTHING_VOID:
                 {
-                    myParent.Heal(_value, _value, 0, myCaster, spellInfo, HEALSOURCE.SOOTHING_VOID, HEALTYPE.PERIODIC_SINGLE);
+                    myParent.Heal(myCaster, spellInfo, HEALSOURCE.SOOTHING_VOID, HEALTYPE.PERIODIC_SINGLE);
                 }
                 break;
             case (int)Buff.DB.TWILIGHT_BEAM:
@@ -160,7 +140,7 @@ public class Buff
                     float _pen = 1.5f - (multiplier*0.1f);
                     int _val = (int)(_value * _pen);
 
-                    Healing _heal = myParent.Heal(_val, _val, GameCore.Core.criticalStrikeChance, myCaster, spellInfo, HEALSOURCE.TWILIGHT_BEAM, HEALTYPE.PERIODIC_SINGLE);
+                    Healing _heal = myParent.Heal(myCaster, _val, myCaster.GetCritChance(), HEALSOURCE.TWILIGHT_BEAM, HEALTYPE.PERIODIC_SINGLE);
                     multiplier += 1;
                 }
                 break;

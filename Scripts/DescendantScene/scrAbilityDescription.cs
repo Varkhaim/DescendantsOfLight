@@ -13,6 +13,6 @@ public class scrAbilityDescription : MonoBehaviour
 
     public void UpdateContent()
     {
-       // GetComponent<Text>().text = DescendantPanelCore.DPCore.GetSpellInfo(whichSpell);
+       GetComponent<Text>().text = DescendantPanelCore.DPCore.GetSpellInfo((SPELL)whichSpell);
     }
 }

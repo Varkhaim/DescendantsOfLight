@@ -38,12 +38,12 @@ public class ItemRepository : IRepo<CombatItem>
     public void FillRepository()
     {
         AddObject(new CombatItem((int)COMBATITEM.MANA_POTION, "Mana Potion", "Restores 30% of your missing mana.", 30, "ManaPotion"));
-        AddObject(new CombatItem((int)COMBATITEM.SCROLL_OF_RENEW, "Scroll of Renew", "Heals everyone for 50% of their maximum health.", 50, "DivineScroll"));
+        AddObject(new CombatItem((int)COMBATITEM.SCROLL_OF_ALAPHI, "Scroll of Renew", "Heals everyone for 50% of their maximum health.", 50, "DivineScroll"));
     }
 }
 
 public enum COMBATITEM
 {
     MANA_POTION,
-    SCROLL_OF_RENEW
+    SCROLL_OF_ALAPHI
 }

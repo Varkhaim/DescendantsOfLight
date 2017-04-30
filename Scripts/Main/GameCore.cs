@@ -119,8 +119,8 @@ public class GameCore
     private void InitItems()
     {
         combatItem[0] = itemRepository.GetObject((int)COMBATITEM.MANA_POTION);
-        combatItem[1] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_RENEW);
-        combatItem[2] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_RENEW);
+        combatItem[1] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_ALAPHI);
+        combatItem[2] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_ALAPHI);
 
         combatItemIcon[0] = GameObject.Find("CombatItemIcon1").GetComponent<Image>();
         combatItemIcon[1] = GameObject.Find("CombatItemIcon2").GetComponent<Image>();
@@ -299,22 +299,6 @@ public class GameCore
 
     public bool GameFinished = false;
 
-    // Healing Done
-    private float HealingDone; // --- ilosc zrobionego healingu
-    private float EncounterTime; // --- czas trwania encountera (potyczki)
-
-    // --- Metoda dodajaca zrobiony healing do statystyk
-    public void AddHealing(float value)
-    {
-        HealingDone += value;
-    }
-    // --- Metoda odswiezajaca statystyki, nalicza czas, oblicza healing na sekunde i przekazuje dane do obiektu odpowiedzialnego za tekst
-    private void RefreshHealingDone()
-    {
-        int HealingPerSecond;
-        EncounterTime++;
-        HealingPerSecond = (int)(HealingDone / (EncounterTime / 60));
-    }
 
     // ************
 
@@ -513,7 +497,7 @@ public class GameCore
         return mytab;
     }
 
-    public void CastAutoSpell(int _spelltype, Soldier _mytarget = null, int minv = 0, int maxv = 0, int DUMMY = 0)
+    public void CastAutoSpell(int _spelltype, Soldier _mytarget = null, int val = 0, int DUMMY = 0)
     {
         switch (_spelltype)
         {
@@ -523,24 +507,26 @@ public class GameCore
                     {
                         if ((_target >= 0) && (_target < 16))
                         {
-                            troopsHandler.soldier[_target].CastFinished(new Moonlight(), myCaster, minv, maxv);
+                            troopsHandler.soldier[_target].CastFinished(new Moonlight(), myCaster, val);
                         }
                     }
                 }
                 break;
             case (int)SPELL.GUIDANCE_OF_RAELA:
                 {
-                    troopsHandler.GetTargets(TARGETTYPE.BY_HEALTH, 1).Soldier[0].Heal(minv, maxv, 0, myCaster, null, HEALSOURCE.GUIDANCE_OF_RAELA, HEALTYPE.OTHER);
+                    troopsHandler.GetTargets(TARGETTYPE.BY_HEALTH, 1).Soldier[0].Heal(myCaster, null, HEALSOURCE.GUIDANCE_OF_RAELA, HEALTYPE.OTHER);
                 }
                 break;
-            case (int)SPELL.SCROLL_OF_RENEW:
+            case (int)SPELL.SCROLL_OF_ALAPHI:
                 {
                     Soldier[] tars = troopsHandler.GetTargets(TARGETTYPE.EVERYONE, 16).Soldier;
+                    SpellEffect alaphi = new ScrollOfAlaphi();
 
                     for (int i = 0; i < 16; i++)
                     {
                         if (tars[i] != null)
-                        tars[i].Heal(minv, maxv, 0, myCaster, spellRepository.Get(SPELL.SCROLL_OF_RENEW), HEALSOURCE.SCROLL_OF_RENEW, HEALTYPE.DIRECT_MULTI);
+                            alaphi.Execute(myCaster, tars[i]);
+                        //tars[i].Heal(myCaster, spellRepository.Get(SPELL.SCROLL_OF_ALAPHI), HEALSOURCE.SCROLL_OF_ALAPHI, HEALTYPE.DIRECT_MULTI);
                     }
                 }
                 break;
@@ -559,7 +545,7 @@ public class GameCore
             for (int i = 0; i < beaconCount; i++)
             {
                 if (beaconedTarget[i] != _primaryTarget)
-                    beaconedTarget[i].CastFinished(new WoKL_Healing(), myCaster, value, value);
+                    beaconedTarget[i].CastFinished(new WoKL_Healing(), myCaster, value);
             }
         }
     }
@@ -785,7 +771,7 @@ public class GameCore
         }
         GameObject.Find("ChampionPortrait").GetComponent<Image>().sprite = Champion.GetPortrait(chosenChampion);
         
-        myCaster = new Caster(myTree);
+        myCaster = new Caster(myTree, chosenAccount);
 
         InitSpells();
         InitItems();
@@ -870,7 +856,6 @@ public class GameCore
 
             if (!GameFinished)
             {
-                RefreshHealingDone();
                 spellCastHandler.Update();
             }
             

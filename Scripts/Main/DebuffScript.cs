@@ -46,7 +46,6 @@ public class DebuffScript : MonoBehaviour {
     {
         if (Input.GetMouseButton(1))
         {
-            Debug.Log("click");
             parentDebuff.Dispel();
         }
     }

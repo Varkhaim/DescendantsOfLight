@@ -15,12 +15,12 @@ public class DivineIntervention : SpellEffect
             target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/DivineInterventionSound"));
     }
 
-    public override void OnCastFinished(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void OnCastFinished(Caster who, Soldier target, int val=0)
     {
         
     }
 
-    public override void Execute(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void Execute(Caster who, Soldier target, int val=0)
     {
         
     }

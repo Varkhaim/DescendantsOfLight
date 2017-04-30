@@ -26,9 +26,9 @@ public class CombatItem
                 {
                     GameCore.Core.RestoreMana(30, 2);
                 } break;
-            case (int)COMBATITEM.SCROLL_OF_RENEW:
+            case (int)COMBATITEM.SCROLL_OF_ALAPHI:
                 {
-                    GameCore.Core.CastAutoSpell((int)SPELL.SCROLL_OF_RENEW, null, 50, 50);
+                    GameCore.Core.CastAutoSpell((int)SPELL.SCROLL_OF_ALAPHI, null, 50);
                 }
                 break;
         }

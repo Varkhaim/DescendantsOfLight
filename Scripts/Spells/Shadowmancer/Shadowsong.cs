@@ -26,19 +26,16 @@ public class Shadowsong : SpellEffect
         }
     }
 
-    public override void OnCastFinished(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void OnCastFinished(Caster who, Soldier target, int val=0)
     {
         Spell.Cast(this, target, who);
     }
 
-    public override void Execute(Caster who, Soldier target, int minval = 0, int maxval = 0)
+    public override void Execute(Caster who, Soldier target, int val=0)
     {
-        int _value = 0;
         SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.SHADOWSONG);
-        _value = spellInfo.baseValue;
-        _value += (int)(GameCore.Core.chosenAccount.statPWR * spellInfo.coeff);
  
-        Healing _heal = target.Heal(_value, _value + 20, GameCore.Core.criticalStrikeChance, who, spellInfo, HEALSOURCE.SHADOWSONG, spellInfo.healtype);
+        Healing _heal = target.Heal(who, spellInfo, HEALSOURCE.SHADOWSONG, spellInfo.healtype);
     }
 
 }
