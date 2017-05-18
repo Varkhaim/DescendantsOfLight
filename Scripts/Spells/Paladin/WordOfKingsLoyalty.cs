@@ -20,12 +20,11 @@ public class WordOfKingsLoyalty : SpellEffect
     public override void Execute(Caster who, Soldier target, int val=0)
     {
         SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.WORD_OF_KINGS_LOYALTY);
-        int dur = spellInfo.HoTgap * spellInfo.ticksCount + who.myAura[(int)AURA.CONSECRATION].stacks * VALUES.CONSECRATION_DUR_INCREASE;
-        target.BuffMe((int)Buff.DB.WORD_OF_KINGS_LOYALTY, dur, who, spellInfo, 0);
+        int dur = spellInfo.HoTgap * spellInfo.ticksCount;
+        target.BuffMe(BUFF.WORD_OF_KINGS_LOYALTY, dur, who, spellInfo, 0);
 
-        int auraStacks = who.AuraStacks(AURA.ROYALTY);
-        if (auraStacks > 0)
-            target.BuffMe((int)Buff.DB.ROYALTY, auraStacks * 90, who, spellInfo, 0);
+        GameCore.Core.paladinSparkHandler.AddSparks(4);
+
         if (!target.frame.GetComponent<AudioSource>().isPlaying)
             target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/WoKLoyaltySound"));
     }

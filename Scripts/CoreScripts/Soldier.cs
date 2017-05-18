@@ -45,6 +45,7 @@ public class Soldier
     private bool isMoving = false;
     private float moveVal;
     public SoldierEffectSystem effectSystem;
+    private HealingHandler healingHandler;
 
     public Soldier(int _myid, string _name, GameObject _frame, float _maxHealth, SOLDIER _type)
     {
@@ -57,6 +58,11 @@ public class Soldier
         health = maxHealth;
         ApplySoldierType();
         effectSystem = new SoldierEffectSystem(this);
+    }
+
+    public void InitHealingHandler()
+    {
+        healingHandler = new HealingHandler(this, core);
     }
 
     private void ApplySoldierType()
@@ -133,7 +139,7 @@ public class Soldier
             case SOLDIER.RANGER: damageTakenBoost *= 1.1f; break;
             case SOLDIER.SHIELDMAN: damageTakenBoost *= 0.6f; break;
         }
-        if ((effectSystem.FindBuff((int)Buff.DB.WORD_OF_KINGS_FAITH) != null) && (core.myCaster.myAura[(int)AURA.IRON_FAITH].isActive))
+        if ((effectSystem.FindBuff(BUFF.WORD_OF_KINGS_FAITH) != null) && (core.myCaster.myAura[(int)AURA.IRON_FAITH].isActive))
         {
             damageTakenBoost *= 1 - (core.myCaster.myAura[(int)AURA.IRON_FAITH].stacks * 0.1f);
         }
@@ -231,9 +237,9 @@ public class Soldier
 
     private int BuffsAmount = 0;
 
-    public void BuffMe(int bufftype, int buffdur, Caster _caster, SpellInfo spellInfo, int _gap, int minv = 0, int maxv = 0)
+    public void BuffMe(BUFF bufftype, int buffdur, Caster _caster, SpellInfo spellInfo, int _gap, int val=0)
     {
-        effectSystem.BuffMe(bufftype, buffdur, _caster, spellInfo, _gap, minv, maxv);
+        effectSystem.BuffMe(bufftype, buffdur, _caster, spellInfo, _gap, val);
 
         UpdateDamageDoneBoost();
         UpdateDamageTakenBoost();
@@ -254,6 +260,7 @@ public class Soldier
 
 
     //******************************************** START HEALING ******************************************** \\
+    /*
     public int Shield(int _value, HEALSOURCE _source)
     {
         absorb[absAmount++] = new Absorb(_value, _source);
@@ -300,33 +307,36 @@ public class Soldier
         }
     }
 
-    private Healing ApplyHealingModifiersByBuff(HEALSOURCE source, Healing baseHeal)
+    private Healing ApplyHealingModifiersByBuff(HEALSOURCE source, Healing baseHeal, Caster _caster)
     {
         Healing newHealing = baseHeal;
-        Buff _myb = effectSystem.FindBuff((int)Buff.DB.FLASH_OF_FUTURE);
-        if ((_myb != null) && (source == HEALSOURCE.WOK_LIGHT))
+        if (source == HEALSOURCE.WOK_LIGHT)
         {
-            newHealing.value = (int)(newHealing.value * 1.5f);
-            _myb.Remove();
-            return newHealing;
+            Buff _myb = effectSystem.FindBuff(BUFF.FAITH);
+            if ((_myb != null))
+            {
+                SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.WORD_OF_KINGS_FAITH);
+                int _dur = spellInfo.ticksCount * spellInfo.HoTgap;
+                int _gap = spellInfo.HoTgap;
+                GameCore.Core.paladinSparkHandler.AddSparks(1);
+                effectSystem.BuffMe(BUFF.WORD_OF_KINGS_FAITH, _dur, _caster, spellInfo, _gap);
+            }
+
+            CasterBuff _casterBuff = GameCore.Core.buffSystem.FindBuff(CASTERBUFF.DIVINE_INTERVENTION);
+            if (baseHeal.isCrit)
+            {
+                if (_casterBuff != null)
+                baseHeal.value = (int)((float)baseHeal.value * (1f + (float)_caster.GetFocus()/100f));
+            }
         }
+
+
 
         return newHealing;
     }
 
     private int ApplyOverhealingModifiers(int overheal_value, Caster _caster, HEALSOURCE source)
     {
-        if (core.buffSystem.FindBuff(CASTERBUFF.DIVINE_INTERVENTION) != null)
-        {
-            if (_caster.AuraActive(AURA.GUIDANCE_OF_RAELA))
-            {
-                if ((source != HEALSOURCE.GUIDANCE_OF_RAELA) && (source != HEALSOURCE.WOK_LOYALTY))
-                {
-                    core.CastAutoSpell((int)SPELL.GUIDANCE_OF_RAELA, null, overheal_value);
-                    return 0;
-                }
-            }
-        }
         return overheal_value;
     }
 
@@ -351,9 +361,17 @@ public class Soldier
         GameObject.Instantiate(VFX, frame.transform.position + new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
     }
 
-    public Healing Heal(Caster _caster, SpellInfo info, HEALSOURCE source, HEALTYPE healtype)
+    public Healing Heal(Caster _caster, SpellInfo info, HEALSOURCE source, HEALTYPE healtype, int whichValue=0)
     {
-        return ApplyHeal(_caster, info.baseValue + (int)(info.coeff * _caster.GetPower()), _caster.GetCritChance(), source, healtype);
+        try
+        {
+            return ApplyHeal(_caster, info.baseValue + (int)(info.coeff * _caster.GetPower()), _caster.GetCritChance(), source, healtype);
+        }
+        catch
+        {
+            Debug.Log("Source: " + source);
+            return null;
+        }
     }
 
     public Healing Heal(Caster _caster, int val, float crit, HEALSOURCE source, HEALTYPE healtype)
@@ -368,17 +386,18 @@ public class Soldier
             Healing myHeal = new Healing(0, false, healtype);
 
             myHeal = CalculateHealing(val, crit, healtype);
+
             myHeal.value = (int)(myHeal.value * _caster.HealingMultiplier());
             myHeal.value = (int)(myHeal.value * healingTakenBoost);
 
-            myHeal = ApplyHealingModifiersBySource(myHeal, _caster, source);            
+            myHeal = ApplyHealingModifiersBySource(myHeal, _caster, source);
 
             WoKLoyaltyBeaconHealing(myHeal, source, healtype);
 
-            myHeal = ApplyHealingModifiersByBuff(source, myHeal);
+            myHeal = ApplyHealingModifiersByBuff(source, myHeal, _caster);
 
             float heal_value = Mathf.Min(myHeal.value, maxHealth - health);
-            heal_value += heal_value * Random.Range(95f, 105f) / 100f;
+            heal_value *= Random.Range(95f, 105f) / 100f;
             int overheal_value = 0;
             overheal_value = Mathf.Max(0, (int)((myHeal.value + health) - maxHealth));
 
@@ -434,7 +453,7 @@ public class Soldier
                     break;
                 case 1:
                     {
-                        posx = 0.1f;
+                        posx = 0.2f;
                         mycolor = Color.white; // absorb
                     }
                     break;
@@ -456,7 +475,7 @@ public class Soldier
             }
 
         }
-    }
+    }*/
     //******************************************** KONIEC HEALING ******************************************** \\
 
     //******************************************** START DAMAGE ******************************************** \\
@@ -474,9 +493,9 @@ public class Soldier
         float _absorbed = 0;
         int temp = absAmount - 1;
 
-        if (effectSystem.FindBuff((int)Buff.DB.ROYALTY) != null)
+        if (effectSystem.FindBuff(BUFF.ROYALTY) != null)
         {
-            LogHealing((int)_damage, false, 1);
+            healingHandler.LogHealing((int)_damage, false, 1);
             core.recount.AddEntry(HEALSOURCE.ROYALTY, (int)_damage, 0); // do logow
         }
         else
@@ -505,7 +524,7 @@ public class Soldier
                 }
             }
 
-            LogHealing((int)_absorbed, false, 1);
+            healingHandler.LogHealing((int)_absorbed, false, 1);
 
             health = Mathf.Max(health - _damage, 0);
             if (health <= 0)
@@ -567,6 +586,16 @@ public class Soldier
                     myd.multiplier += 4f / val1;
             }
         }
+    }
+
+    public Healing Heal(Caster _caster, SpellInfo info, HEALSOURCE source, HEALTYPE healtype, int whichValue = 0)
+    {
+        return healingHandler.Heal(_caster, info, source, healtype, whichValue);
+    }
+
+    public Healing Heal(Caster _caster, int val, float crit, HEALSOURCE source, HEALTYPE healtype)
+    {
+        return healingHandler.Heal(_caster, val, crit, source, healtype);
     }
 
     public void CastFinished(SpellEffect mySpell, Caster _caster, int val=0)

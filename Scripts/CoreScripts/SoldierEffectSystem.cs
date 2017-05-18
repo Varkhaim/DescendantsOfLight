@@ -19,15 +19,15 @@ public class SoldierEffectSystem
 
     private int BuffsAmount = 0;
 
-    public void BuffMe(int bufftype, int buffdur, Caster _caster, SpellInfo spellInfo, int _gap, int minv = 0, int maxv = 0)
+    public void BuffMe(BUFF bufftype, int buffdur, Caster _caster, SpellInfo spellInfo, int _gap, int val=0)
     {
         Buff myBuff = FindBuff(bufftype);
 
         if (myBuff == null)
         {
-            Buffs[BuffsAmount] = new Buff(bufftype, buffdur, soldier, _caster, spellInfo, _gap, minv, maxv);
+            Buffs[BuffsAmount] = GetBuffEffect(bufftype, buffdur, _caster, spellInfo, _gap, val);
             Buffs[BuffsAmount].icon = Object.Instantiate(Resources.Load("BuffIcon"), soldier.frame.transform.position + new Vector3(1.5f, -0.6f, 0), Quaternion.Euler(0, 0, 0)) as GameObject;
-            Buffs[BuffsAmount].SetIcon(GetBuffResource(bufftype));
+            Buffs[BuffsAmount].SetIcon();
             Buffs[BuffsAmount].icon.transform.SetParent(GameObject.Find("Canvas").transform);
             Buffs[BuffsAmount].icon.transform.localScale = new Vector3(1, 1, 1);
 
@@ -36,7 +36,7 @@ public class SoldierEffectSystem
 
             BuffsAmount++;
 
-            if (bufftype == (int)Buff.DB.WORD_OF_KINGS_LOYALTY)
+            if (bufftype == BUFF.WORD_OF_KINGS_LOYALTY)
             {
                 soldier.core.AddBeaconedTarget(soldier);
             }
@@ -47,18 +47,30 @@ public class SoldierEffectSystem
         myBuff.Refresh(0);
     }
 
-    public static Sprite GetBuffResource(int _buff)
+    private Buff GetBuffEffect(BUFF bufftype, int buffdur, Caster _caster, SpellInfo spellInfo, int _gap, int val = 0)
+    {
+        switch (bufftype)
+        {
+            case BUFF.WORD_OF_KINGS_FAITH: return new WordOfKingsFaith_Buff(bufftype, buffdur, soldier, _caster, spellInfo, _gap, val);
+            case BUFF.FAITH: return new Faith_Buff(bufftype, buffdur, soldier, _caster, spellInfo, _gap, val);
+            case BUFF.WORD_OF_KINGS_LOYALTY: return new WordOfKingsLoyalty_Buff(bufftype, buffdur, soldier, _caster, spellInfo, _gap, val);
+            default: { Debug.Log(bufftype); return null; }
+        }
+        
+    }
+
+    public static Sprite GetBuffResource(BUFF _buff)
     {
         switch (_buff)
         {
             case 0: return Resources.Load<Sprite>("BuffsIcons/");
-            case (int)Buff.DB.WORD_OF_KINGS_FAITH: return Resources.Load<Sprite>("BuffsIcons/WordOfKingsFaith");
-            case (int)Buff.DB.WORD_OF_KINGS_LOYALTY: return Resources.Load<Sprite>("BuffsIcons/WordOfKingsLoyalty");
-            case (int)Buff.DB.ROYALTY: return Resources.Load<Sprite>("BuffsIcons/Royalty");
-            case (int)Buff.DB.SHADOWMEND: return Resources.Load<Sprite>("BuffsIcons/Shadowmend");
-            case (int)Buff.DB.FLASH_OF_FUTURE: return Resources.Load<Sprite>("BuffsIcons/FlashofFuture");
-            case (int)Buff.DB.SOOTHING_VOID: return Resources.Load<Sprite>("BuffsIcons/SoothingVoid");
-            case (int)Buff.DB.TWILIGHT_BEAM: return Resources.Load<Sprite>("BuffsIcons/TwilightBeam");
+            case BUFF.WORD_OF_KINGS_FAITH: return Resources.Load<Sprite>("BuffsIcons/WordOfKingsFaith");
+            case BUFF.WORD_OF_KINGS_LOYALTY: return Resources.Load<Sprite>("BuffsIcons/WordOfKingsLoyalty");
+            case BUFF.ROYALTY: return Resources.Load<Sprite>("BuffsIcons/Royalty");
+            case BUFF.SHADOWMEND: return Resources.Load<Sprite>("BuffsIcons/Shadowmend");
+            case BUFF.FLASH_OF_FUTURE: return Resources.Load<Sprite>("BuffsIcons/FlashofFuture");
+            case BUFF.SOOTHING_VOID: return Resources.Load<Sprite>("BuffsIcons/SoothingVoid");
+            case BUFF.TWILIGHT_BEAM: return Resources.Load<Sprite>("BuffsIcons/TwilightBeam");
             default: return Resources.Load<Sprite>("effect");
         }
     }
@@ -125,7 +137,7 @@ public class SoldierEffectSystem
         }
     }
 
-    public Buff FindBuff(int bufftype)
+    public Buff FindBuff(BUFF bufftype)
     {
         if (BuffsAmount <= 0)
         {

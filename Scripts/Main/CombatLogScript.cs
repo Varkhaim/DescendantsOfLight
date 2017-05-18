@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class CombatLogScript : MonoBehaviour
 {
 
-    private float lifetime = 90f;
+    private float lifetime = 120f;
     public bool isCrit;
     float xstr, ystr;
     // Use this for initialization
@@ -33,7 +33,7 @@ public class CombatLogScript : MonoBehaviour
 
         if (!isCrit)
         {
-            transform.Translate(new Vector3(0, 0.01f, 0));
+            transform.Translate(new Vector3(0, 0.008f, 0));
         }
 
         /*

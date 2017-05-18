@@ -15,6 +15,7 @@ public class GameCore
     public Account chosenAccount;
     public Adventure chosenAdventure;
     public EnemySpellInfoHandler espellHandler;
+    public InitHandler initHandler;
 
     //public SpellQueue spellQueue;
 
@@ -28,6 +29,7 @@ public class GameCore
         chosenAccount.LoadAccData();
         chosenAdventure = new Adventure(-1);
         espellHandler = new EnemySpellInfoHandler();
+        initHandler = new InitHandler();
         //spellQueue = new SpellQueue();
     }
 
@@ -69,7 +71,7 @@ public class GameCore
     // System spelli      //
     ////////////////////////
 
-    private int spellsAmount = 5;
+    public int spellsAmount = 5;
     public int actualSpell = 0; // indeks wybranego spella
     public Spell[] PlayerSpell;
     public Recount recount;
@@ -77,59 +79,26 @@ public class GameCore
     public Spell castedSpell;
     public BuffHandler buffSystem;
     public GameObject frame;
-    public bool isTSR = true; // three seconds rule
+    
     public GameObject mySpellIcon;
-    private int TSRtimer = 0;
+    
 
     public bool isInteruptOnCD = false;
     private int interuptCD = 480;
-    private GameObject interuptIcon;
-    private GameObject interuptText;
+    public GameObject interuptIcon;
+    public GameObject interuptText;
 
     public bool isDispelOnCD = false;
     private int DispelCD = 480;
-    private GameObject DispelIcon;
-    private GameObject DispelText;
+    public GameObject DispelIcon;
+    public GameObject DispelText;
 
     public CombatItem[] combatItem = new CombatItem[3];
     public Image[] combatItemIcon = new Image[3];
 
-    private void InitSpells()
-    {
-        PlayerSpell = new Spell[spellsAmount];
-        PlayerSpell = Spell.GenerateSpellKit(chosenChampion, myCaster);
-        for (int i = 0; i < spellsAmount; i++)
-        {
-            PlayerSpell[i] = new Spell(PlayerSpell[i].ID);
-            PlayerSpell[i].myIcon = GameObject.Find("SpellMask" + (i + 1).ToString());
-            PlayerSpell[i].myIcon.transform.GetChild(0).GetComponent<Image>().sprite = PlayerSpell[i].iconSprite;
-            PlayerSpell[i].myIcon.transform.GetChild(0).GetComponent<SpellScript>().myID = i;
-            PlayerSpell[i].myChargeCounter = GameObject.Find("ChargesText" + (i + 1).ToString());
-        }
-        interuptIcon = GameObject.Find("InteruptSpellMask");
-        interuptText = GameObject.Find("InteruptCDText");
+    public PaladinSparkHandler paladinSparkHandler;
 
-        DispelIcon = GameObject.Find("DispelMask");
-        DispelText = GameObject.Find("DispelCDText");
-
-        RefreshPickedSpellFrame();
-    }
-
-    // itemy
-    private void InitItems()
-    {
-        combatItem[0] = itemRepository.GetObject((int)COMBATITEM.MANA_POTION);
-        combatItem[1] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_ALAPHI);
-        combatItem[2] = itemRepository.GetObject((int)COMBATITEM.SCROLL_OF_ALAPHI);
-
-        combatItemIcon[0] = GameObject.Find("CombatItemIcon1").GetComponent<Image>();
-        combatItemIcon[1] = GameObject.Find("CombatItemIcon2").GetComponent<Image>();
-        combatItemIcon[2] = GameObject.Find("CombatItemIcon3").GetComponent<Image>();
-
-        RefreshItemIcons();
-    }
-
-    private void RefreshItemIcons()
+    public void RefreshItemIcons()
     {
         for (int i=0; i<3; i++)
         {
@@ -180,7 +149,7 @@ public class GameCore
     {
         actualSpell = _no;
 
-        if (actualSpell == 1) // TESTING
+        if (PlayerSpell[actualSpell].spellInfo.spellType == SPELL_TYPE.AOE_INDICATOR) // TESTING
             InitIndicatorSpell();
         else
             ResetIndicatorSpell();
@@ -191,7 +160,7 @@ public class GameCore
     const string UISLOT = "spellSlot";
     const string UISLOT_ACTIVE = "spellSlotPicked";
     GameObject myring = null;
-    private void RefreshPickedSpellFrame()
+    public void RefreshPickedSpellFrame()
     {
         if (myring != null)
             myring.GetComponent<Image>().sprite = Resources.Load<Sprite>(UISLOT);
@@ -199,11 +168,11 @@ public class GameCore
         myring.GetComponent<Image>().sprite = Resources.Load<Sprite>(UISLOT_ACTIVE);
     }
 
-    public Spell FindSpellByName(string _name)
+    public Spell FindSpell(SPELL _spell)
     {
         for (int i = 0; i < spellsAmount; i++)
         {
-            if (PlayerSpell[i].name == _name)
+            if (PlayerSpell[i].ID == _spell)
                 return PlayerSpell[i];
         }
         return null;
@@ -211,7 +180,7 @@ public class GameCore
 
     // AURAS
 
-    private void ApplyAuras()
+    public void ApplyAuras()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -223,12 +192,12 @@ public class GameCore
 
     public int criticalStrikeChance = 0;
 
-    private void UpdateStats()
+    public void UpdateStats()
     {
         criticalStrikeChance = chosenAccount.statFCS;
 
         if (GameCore.chosenChampion == CHAMPION.PALADIN)
-        criticalStrikeChance += myCaster.myAura[(int)AURA.DIVINITY].stacks * VALUES.DIVINITY_CRIT_INCREASE;
+        criticalStrikeChance += myCaster.AuraStacks(AURA.DIVINITY) * VALUES.DIVINITY_CRIT_INCREASE;
     }
 
     // PALADIN UNIQUE
@@ -288,14 +257,6 @@ public class GameCore
     public GameObject myPortrait;
     public GameObject myHealingDoneText;
     public Soldier ActualSoldier;
-    public float manaRegen = 1f;
-
-    public float ManaMax;
-    public float ManaCurrent;
-    public void RegenerateMana(float amount)
-    {
-        ManaCurrent = Mathf.Min(ManaMax, ManaCurrent + amount);
-    }
 
     public bool GameFinished = false;
 
@@ -318,7 +279,7 @@ public class GameCore
         }
     }
 
-    private GameObject myBlackScreen;
+    public GameObject myBlackScreen;
     public float bsAlpha = 0f;
     private bool itemReceived;
 
@@ -407,56 +368,7 @@ public class GameCore
         return false;
     }
 
-    public void SpendMana(Spell _spell)
-    {
-
-        int realManaCost = spellRepository.Get(_spell.ID).manaCost;
-
-        if (_spell.ID == SPELL.WORD_OF_KINGS_FAITH)
-        {
-            if (ConsumeCasterBuff(CASTERBUFF.HAND_OF_LIGHT))
-                realManaCost = 0;
-        }
-
-        if (_spell.ID == SPELL.WORD_OF_KINGS_LOYALTY)
-        {
-            realManaCost = (int)Mathf.Max(0, realManaCost - realManaCost*myCaster.myAura[(int)AURA.ROYALTY].stacks * VALUES.ROYALTY_PERCENT);
-        }
-
-        
-        bool spellException = false;
-        
-        if (_spell.ID == (int)SPELL.WORD_OF_KINGS_LIGHT)
-        {
-            if (myCaster.myAura[(int)AURA.MODESTY].isActive)
-            {
-                if (isTSR)
-                    spellException = true;
-            }
-        }
-        
-        if ((GameCore.Core.spellRepository.Get(_spell.ID).manaCost > 0) && (!spellException))
-        {
-            TSRtimer = 0;
-            if (isTSR)
-            {
-                isTSR = false;
-                myManaBar.GetComponent<Image>().sprite = Resources.Load<Sprite>("manabar");
-            }
-        }
-
-        ManaCurrent -= realManaCost;
-    }
-
-    public void RestoreMana(float _amount, int _type = 0)
-    {
-        switch (_type)
-        {
-            case 0: ManaCurrent = Mathf.Min(ManaCurrent + _amount, ManaMax); break; // przywrocenie konkretnej wartosci
-            case 1: ManaCurrent = Mathf.Min(ManaCurrent + (_amount * 0.01f * ManaMax), ManaMax); break; // przywrocenie % max many
-            case 2: ManaCurrent = Mathf.Min(ManaCurrent + (_amount * 0.01f * (ManaMax - ManaCurrent)), ManaMax); break; // przywrocenie % utraconej many
-        }
-    }
+    
 
     public TalentTree myTree;
     public Caster myCaster;
@@ -510,11 +422,6 @@ public class GameCore
                             troopsHandler.soldier[_target].CastFinished(new Moonlight(), myCaster, val);
                         }
                     }
-                }
-                break;
-            case (int)SPELL.GUIDANCE_OF_RAELA:
-                {
-                    troopsHandler.GetTargets(TARGETTYPE.BY_HEALTH, 1).Soldier[0].Heal(myCaster, null, HEALSOURCE.GUIDANCE_OF_RAELA, HEALTYPE.OTHER);
                 }
                 break;
             case (int)SPELL.SCROLL_OF_ALAPHI:
@@ -638,33 +545,6 @@ public class GameCore
         }
     }
 
-    // --- Metoda ktora regeneruje mane i odswieza pasek many
-    private void ManaRegeneration()
-    {
-        ManaCurrent = Mathf.Min(ManaMax, ManaCurrent + manaRegen);
-        myManaBar.GetComponent<ManaBarScript>().ManaMax = ManaMax;
-        myManaBar.GetComponent<ManaBarScript>().ManaCurrent = ManaCurrent;
-
-        if (TSRtimer < 180)
-        {
-            TSRtimer++;
-        }
-        else
-        {
-            isTSR = true;
-            myManaBar.GetComponent<Image>().sprite = Resources.Load<Sprite>("manabartsr");
-        }
-
-        if (isTSR)
-        {
-            manaRegen = VALUES.BASE_MANA_REGEN;
-            if (GameCore.chosenChampion == CHAMPION.PALADIN)
-                manaRegen *= 1f + (myCaster.myAura[(int)AURA.MODESTY].stacks * VALUES.MODESTY_INCREASE);
-        }
-        else
-            manaRegen = VALUES.BASE_MANA_REGEN / 2;
-    }
-
     private void ClearScene()
     {
        // for (int i = 0; i < troopsHandler.SoldierAmount; i++)
@@ -746,41 +626,7 @@ public class GameCore
         }
     }
 
-    public void InitMainScene()
-    {
-        ManaMax = 500f + chosenAccount.statKNG*40;
-        ManaCurrent = ManaMax;
-
-        buffSystem = new BuffHandler(GameObject.Find("GCDBar").transform.position);
-
-        chosenAccount.RefreshStats();
-        myBlackScreen = GameObject.Find("BlackScreen");
-        mySpellIcon = GameObject.Find("MySpellIcon");
-        recount = new Recount();
-        myEnemy = WorldMapCore.WMCore.adventureInfoHandler.GetEncounter(GameCore.Core.chosenAdventure, GameCore.difficulty);
-        myEnemy.InitEncounter();
-
-        chosenChampion = DescendantPanelCore.DPCore.pickedChampion;
-        _mytip = GameObject.Find("Tooltip");
-        if (chosenAccount.myTalentTree != null)
-            myTree = chosenAccount.myTalentTree;
-        else
-        {
-            myTree = new TalentTree(chosenChampion);
-            myTree.DefaultTree();
-        }
-        GameObject.Find("ChampionPortrait").GetComponent<Image>().sprite = Champion.GetPortrait(chosenChampion);
-        
-        myCaster = new Caster(myTree, chosenAccount);
-
-        InitSpells();
-        InitItems();
-
-        UpdateStats();
-        ApplyAuras();
-    }
-
-    private GameObject _mytip;
+    public GameObject _mytip;
 
     public SpellInfo[] spellInfo = new SpellInfo[20];
 
@@ -859,7 +705,7 @@ public class GameCore
                 spellCastHandler.Update();
             }
             
-            ManaRegeneration();
+            myCaster.ManaRegeneration();
 
             if ((troopsHandler.SoldierAmount <= 0) && (!GameFinished))
             {

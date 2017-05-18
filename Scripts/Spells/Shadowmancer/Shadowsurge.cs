@@ -18,7 +18,7 @@ public class Shadowsurge : SpellEffect
 
     public override void OnCastFinished(Caster who, Soldier target, int val=0)
     {
-        if (target.effectSystem.FindBuff((int)Buff.DB.SOOTHING_VOID) != null)
+        if (target.effectSystem.FindBuff(BUFF.SOOTHING_VOID) != null)
             Spell.Cast(this, target, who);
     }
 

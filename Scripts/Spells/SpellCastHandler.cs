@@ -13,6 +13,7 @@ public class SpellCastHandler
 
     private int castProgress = 0;
     private int castTime = 0;
+    private int manaToSpend;
 
     private bool isCasting = false;
 
@@ -74,7 +75,7 @@ public class SpellCastHandler
                 //GameCore.Core.mySpellIcon.GetComponent<Image>().color = Color.clear;
                 myCastBar.GetComponent<CastBar>().Clear();
                 isCasting = false;
-                CastSpell(spell);
+                CastSpell();
                 castProgress = 0;
             }
         }
@@ -91,14 +92,20 @@ public class SpellCastHandler
 
     private bool CheckMana()
     {
-        if (GameCore.Core.ManaCurrent - GameCore.Core.spellRepository.Get(spell.ID).manaCost <= 0)
-        {
+        int spellManaCost = GameCore.Core.spellRepository.Get(spell.ID).manaCost;
+        manaToSpend = spellManaCost;
+        
+        if (spell.ID == SPELL.WORD_OF_KINGS_COURAGE)
+            if (GameCore.Core.buffSystem.FindBuff(CASTERBUFF.DIVINE_INTERVENTION) != null)
+            {
+                manaToSpend = 0;
+                return true;
+            }
+
+        if (GameCore.Core.myCaster.ManaCurrent - spellManaCost <= 0)
             return false;
-        }
-        else
-        {
-            return true;
-        }
+                
+        return true;
     }
 
     public void PrepareSpell(Soldier[] _targets, Spell spell, Caster caster)
@@ -146,7 +153,7 @@ public class SpellCastHandler
 
                     if (castTime == 0)
                     {
-                        CastSpell(spell);
+                        CastSpell();
                     }
                     else
                     {
@@ -190,13 +197,13 @@ public class SpellCastHandler
         return _cast;
     }
 
-    public void CastSpell(Spell mySpell)
+    public void CastSpell()
     {
         GameCore.Core.troopsHandler.SortSoldiers();
 
         spell.SetCooldown();
 
-        GameCore.Core.SpendMana(mySpell); // zuzywamy mane
+        GameCore.Core.myCaster.SpendMana(manaToSpend); // zuzywamy mane
 
         foreach (Soldier _tar in targets)
         {

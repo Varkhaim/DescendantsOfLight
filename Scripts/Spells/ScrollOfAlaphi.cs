@@ -24,7 +24,7 @@ public class ScrollOfAlaphi : SpellEffect
 
         target.Heal(who, (int)(target.maxHealth*0.5f), 0f, HEALSOURCE.SCROLL_OF_ALAPHI, spellInfo.healtype);
 
-        target.SpawnEffect(Resources.Load("Animations/lightexplosion_0") as GameObject);        
+        //target.SpawnEffect(Resources.Load("Animations/lightexplosion_0") as GameObject);        
     }
 
 }

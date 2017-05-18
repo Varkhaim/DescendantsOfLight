@@ -3,11 +3,24 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+public enum BUFF
+{
+    NOTHING,
+    WORD_OF_KINGS_FAITH,
+    FAITH,
+    WORD_OF_KINGS_LOYALTY,
+    ROYALTY,
+    FLASH_OF_FUTURE,
+    SOOTHING_VOID,
+    TWILIGHT_BEAM,
+    SHADOWMEND
+}
+
 public class Buff
 {
 
 
-    public int ID;
+    public BUFF ID;
     public float duration;
     public float maxDuration;
     public GameObject icon = null;
@@ -18,22 +31,12 @@ public class Buff
     public int refreshCount = 0;
     public SpellEffect mEffect;
     public SpellInfo spellInfo;
-    public int minv, maxv;
+    public int val;
     public int gap;
+    protected Sprite myIcon;
+    
 
-    public enum DB
-    {
-        NOTHING,
-        WORD_OF_KINGS_FAITH,
-        WORD_OF_KINGS_LOYALTY,
-        ROYALTY,
-        FLASH_OF_FUTURE,
-        SOOTHING_VOID,
-        TWILIGHT_BEAM,
-        SHADOWMEND
-    }
-
-    public Buff(int _ID, int _duration, Soldier _myParent, Caster _caster, SpellInfo _info, int _gap, int _minv =0, int _maxv =0)
+    public Buff(BUFF _ID, int _duration, Soldier _myParent, Caster _caster, SpellInfo _info, int _gap, int _val=0)
     {
         ID = _ID;
         maxDuration = _duration;
@@ -42,12 +45,11 @@ public class Buff
         myCaster = _caster;
         spellInfo = _info;
         mEffect = spellInfo.effect;
-        minv = _minv;
-        maxv = _maxv;
+        val = _val;
         gap = _gap;
     }
 
-    public void Refresh(float _value)
+    public virtual void Refresh(float _value)
     {
         // 0 - odswiez do pelnego czasu
         if (_value == 0)
@@ -65,12 +67,19 @@ public class Buff
         icon.transform.GetChild(0).GetComponent<Image>().sprite = _icon;
     }
 
-    public void Remove()
+    public void SetIcon()
     {
+        icon.transform.GetChild(0).GetComponent<Image>().sprite = myIcon;
+    }
+
+    public virtual void Remove()
+    {
+        /*
         if (ID ==(int)DB.WORD_OF_KINGS_LOYALTY)
         {
             GameCore.Core.RemoveBeaconedTarget(myParent);
         }
+        */
 
         Object.Destroy(myText);
         Object.Destroy(icon);
@@ -89,16 +98,15 @@ public class Buff
             {
                 icon.transform.GetChild(3).GetComponent<Image>().fillAmount = (float)duration / (float)maxDuration;
             }
-            //if (icon != null)
-            //icon.GetComponent<Image>().color = new Color(1, 1, 1, Mathf.Max(duration / 180f, duration / maxDuration));
         }
 
         if (myText != null)
             myText.GetComponent<TextMesh>().text = Mathf.Ceil(duration / 60f).ToString();
     }
 
-    public void Execute()
+    public virtual void Execute()
     {
+        /*
         int _value = 0;
         _value = spellInfo.baseValue2 / spellInfo.ticksCount;
         _value += (int)(GameCore.Core.chosenAccount.statPWR * spellInfo.coeff2 / spellInfo.ticksCount);
@@ -110,7 +118,7 @@ public class Buff
                     // no buff
                 }
                 break;
-            case (int)Buff.DB.WORD_OF_KINGS_FAITH:
+            case BUFF.WORD_OF_KINGS_FAITH:
                 {
                     Healing temp = myParent.Heal(myCaster, spellInfo, HEALSOURCE.WOK_FAITH, HEALTYPE.PERIODIC_SINGLE);
                     if (temp.isCrit)
@@ -125,17 +133,17 @@ public class Buff
                     }
                 }
                 break;
-            case (int)Buff.DB.SHADOWMEND:
+            case BUFF.SHADOWMEND:
                 {
                     myParent.Heal(myCaster, spellInfo, HEALSOURCE.SHADOWMEND, HEALTYPE.PERIODIC_MULTI);
                 }
                 break;
-            case (int)Buff.DB.SOOTHING_VOID:
+            case BUFF.SOOTHING_VOID:
                 {
                     myParent.Heal(myCaster, spellInfo, HEALSOURCE.SOOTHING_VOID, HEALTYPE.PERIODIC_SINGLE);
                 }
                 break;
-            case (int)Buff.DB.TWILIGHT_BEAM:
+            case BUFF.TWILIGHT_BEAM:
                 {
                     float _pen = 1.5f - (multiplier*0.1f);
                     int _val = (int)(_value * _pen);
@@ -145,6 +153,7 @@ public class Buff
                 }
                 break;
         }
+        */
     }
 }
 

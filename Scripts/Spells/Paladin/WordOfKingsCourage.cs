@@ -10,21 +10,7 @@ public class WordOfKingsCourage : SpellEffect
 
     public override void OnCast(Caster who, Soldier target)
     {
-        /*
-        Troop targets = core.troopsHandler.GetTargets(TARGETTYPE.BY_HEALTH,5);
-        for (int i = 0; i < targets.amount; i++)
-        {
-            if (targets.Soldier[i] != null)
-            targets.Soldier[i].CastFinished(this, who);
-        }
-        */
         target.CastFinished(this, who);
-        if (who.myAura[(int)AURA.GENEROUSITY].isActive)
-        {
-            GameCore.Core.FindSpellByName("Divine Intervention").ChangeCooldown(VALUES.GENEROUSITY_REDUCTION);
-        }
-        //if (!target.frame.GetComponent<AudioSource>().isPlaying)
-        //    target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/WoKCourageSound"));
     }
 
     public override void OnCastFinished(Caster who, Soldier target, int val=0)
@@ -39,6 +25,8 @@ public class WordOfKingsCourage : SpellEffect
         //Object.Instantiate(Resources.Load("Visuals/WoKCourageParticle"), target.frame.transform.position + new Vector3(1.4f, -0.5f), Quaternion.Euler(270, 0, 0));
 
         target.Heal(who, spellInfo, HEALSOURCE.WOK_COURAGE, spellInfo.healtype);
+
+        GameCore.Core.paladinSparkHandler.AddSparks(1);
 
         GameObject.Instantiate(Resources.Load("Animations/lightexplosion_0"), target.frame.transform.position + new Vector3(0, 0.35f, 0), Quaternion.Euler(0, 0, 0));
     }

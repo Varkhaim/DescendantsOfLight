@@ -13,7 +13,7 @@ public class scrFightSceneController : MonoBehaviour
     void Start()
     {
         InitSoldierUnitFrames();
-        core.InitMainScene();
+        core.initHandler.InitMainScene(core);
     }
 
     private void InitSoldierUnitFrames()

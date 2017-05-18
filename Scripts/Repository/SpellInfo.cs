@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum SPELL_TYPE
+{
+    NORMAL,
+    AOE_INDICATOR,
+    HIDDEN
+}
+
 public class SpellInfo
 {
     public SPELL ID { get; set; }
@@ -20,10 +27,11 @@ public class SpellInfo
     public HEALTYPE healtype { get; set; }
     public bool channeling { get; set; }
     public SpellEffect effect { get; set; }
+    public SPELL_TYPE spellType { get; set; }
 
     public SpellInfo(SPELL _id, string _name, int _basevalue, float _coeff, int _basevalue2,
         float _coeff2, int _castTime, int _cooldown, int _charges, int _chargesGain,
-        string _icon, int _HoTgap, int _ticksCount, int _manaCost, HEALTYPE _healtype, bool _channeling, SpellEffect _effect)
+        string _icon, int _HoTgap, int _ticksCount, int _manaCost, HEALTYPE _healtype, bool _channeling, SpellEffect _effect, SPELL_TYPE _spellType)
     {
         ID = _id;
         name = _name;
@@ -42,6 +50,7 @@ public class SpellInfo
         healtype = _healtype;
         channeling = _channeling;
         effect = _effect;
+        spellType = _spellType;
     }
 
     public SpellInfo()

@@ -10,7 +10,7 @@ public class DivineIntervention : SpellEffect
 
     public override void OnCast(Caster who, Soldier target)
     {
-        GameCore.Core.buffSystem.BuffMe(CASTERBUFF.DIVINE_INTERVENTION, 900f, who);
+        GameCore.Core.buffSystem.BuffMe(CASTERBUFF.DIVINE_INTERVENTION, 300f + GameCore.Core.paladinSparkHandler.SpendSparks(), who);
         if (!target.frame.GetComponent<AudioSource>().isPlaying)
             target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/DivineInterventionSound"));
     }

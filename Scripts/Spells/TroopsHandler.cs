@@ -32,6 +32,7 @@ public class TroopsHandler
             if (scrTroopsScene.pickedTypes[i] != SOLDIER.NONE)
                 _type = scrTroopsScene.pickedTypes[i];
             soldier[i] = new Soldier(i, RandomName(), null, 600f, _type);
+            soldier[i].InitHealingHandler();
             soldierPlace[i] = soldier[i];
             if (soldier[i].type == SOLDIER.SHIELDMAN)            
                 tank[tanksAmount++] = soldier[i];

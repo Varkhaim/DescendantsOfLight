@@ -11,7 +11,7 @@ public class Spell
     public static Spell[] GenerateSpellKit(CHAMPION classID, Caster _mycaster = null)
     {
         SPELL[] _myIDs = new SPELL[5];
-        Spell[] _mykit = new Spell[5];
+        Spell[] _mykit = new Spell[5];      
 
         switch (classID)
         {
@@ -115,6 +115,7 @@ public class Spell
     public int castTime;
 
     public SpellEffect mEffect;
+    public SpellInfo spellInfo;
 
     public int baseValue; // bazowa wartosc
     public float coeff = 1f; // przelicznik z Mocy na efektywnosc
@@ -123,18 +124,18 @@ public class Spell
     public Spell(SPELL _ID)
     {
         ID = _ID;
-        SpellInfo info = GameCore.Core.spellRepository.Get(_ID);
-        maxCooldown = info.cooldown;
+        spellInfo = GameCore.Core.spellRepository.Get(_ID);
+        maxCooldown = spellInfo.cooldown;
         cooldown = maxCooldown;
-        iconSprite = Resources.Load<Sprite>(info.icon);
-        name = info.name;
-        manacost = info.manaCost;
+        iconSprite = Resources.Load<Sprite>(spellInfo.icon);
+        name = spellInfo.name;
+        manacost = spellInfo.manaCost;
         myIcon = null;
         mEffect = GameCore.Core.spellRepository.Get(ID).effect;
-        maxCharges = info.charges;
+        maxCharges = spellInfo.charges;
         charges = maxCharges;
-        chargeLoad = info.chargesGain;
-        castTime = info.castTime;
+        chargeLoad = spellInfo.chargesGain;
+        castTime = spellInfo.castTime;
     }
 
     public void Update()
@@ -212,7 +213,7 @@ public class Spell
     {
         if (ID == SPELL.WORD_OF_KINGS_COURAGE)
         {
-            maxCooldown -= GameCore.Core.myCaster.myAura[(int)AURA.GENEROUSITY].stacks * VALUES.GENEROUSITY_VALUE;
+            maxCooldown -= GameCore.Core.myCaster.AuraStacks(AURA.GENEROUSITY) * VALUES.GENEROUSITY_VALUE;
         }
     }
 

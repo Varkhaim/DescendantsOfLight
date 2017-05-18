@@ -24,7 +24,7 @@ public class CombatItem
         {
             case (int)COMBATITEM.MANA_POTION:
                 {
-                    GameCore.Core.RestoreMana(30, 2);
+                    GameCore.Core.myCaster.RestoreMana(30, 2);
                 } break;
             case (int)COMBATITEM.SCROLL_OF_ALAPHI:
                 {

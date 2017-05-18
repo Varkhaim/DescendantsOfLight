@@ -37,22 +37,22 @@ public class SpellRepository
 
     public void FillRepository()
     {
-        spellRepo.Add(SPELL.WORD_OF_KINGS_LIGHT, new SpellInfo(SPELL.WORD_OF_KINGS_LIGHT, "Word of Kings: Light", 100, 0.75f, 0, 0, 60, 0, 1, 1, "SpellIcons/Paladin/WordOfKingsLight", 0, 0, 25, HEALTYPE.DIRECT_SINGLE, false, new WordOfKingsLight()));
-        spellRepo.Add(SPELL.WORD_OF_KINGS_COURAGE, new SpellInfo(SPELL.WORD_OF_KINGS_COURAGE, "Word of Kings: Courage", 200, 1f, 0, 0, 0, 600, 1, 1, "SpellIcons/Paladin/WordOfKingsCourage", 0, 0, 40, HEALTYPE.DIRECT_MULTI, false, new WordOfKingsCourage()));
-        spellRepo.Add(SPELL.WORD_OF_KINGS_FAITH, new SpellInfo(SPELL.WORD_OF_KINGS_FAITH, "Word of Kings: Faith", 100, 0, 400, 2f, 90, 0, 1, 1, "SpellIcons/Paladin/wordOfKingsFaith", 60, 5, 35, HEALTYPE.PERIODIC_SINGLE, false, new WordOfKingsFaith()));
-        spellRepo.Add(SPELL.WORD_OF_KINGS_LOYALTY, new SpellInfo(SPELL.WORD_OF_KINGS_LOYALTY, "Word of Kings: Loyalty", 0, 0, 0, 0, 0, 3600, 4, 1, "SpellIcons/Paladin/WordOfKingsLoyalty", 3600, 1, 50, HEALTYPE.OTHER, false, new WordOfKingsLoyalty()));
-        spellRepo.Add(SPELL.WORD_OF_KINGS_LOYALTY_HEALING, new SpellInfo(SPELL.WORD_OF_KINGS_LOYALTY_HEALING, "WoKHealing", 0, 0, 0, 0, 0, 0, 0, 0, "SpellIcons/Paladin/Consecrate", 0, 0, 0, HEALTYPE.OTHER, false, new WoKL_Healing()));
-        spellRepo.Add(SPELL.DIVINE_INTERVENTION, new SpellInfo(SPELL.DIVINE_INTERVENTION, "Divine Intervention", 0, 0, 0, 0, 0, 7200, 1, 1, "SpellIcons/Paladin/DivineIntervention", 900, 1, 0, HEALTYPE.OTHER, false, new DivineIntervention()));
+        spellRepo.Add(SPELL.WORD_OF_KINGS_LIGHT, new SpellInfo(SPELL.WORD_OF_KINGS_LIGHT, "Word of Kings: Light", 50, 0.75f, 0, 0, 60, 0, 1, 1, "SpellIcons/Paladin/WordOfKingsLight", 0, 0, 0, HEALTYPE.DIRECT_SINGLE, false, new WordOfKingsLight(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.WORD_OF_KINGS_COURAGE, new SpellInfo(SPELL.WORD_OF_KINGS_COURAGE, "Word of Kings: Courage", 200, 1f, 0, 0, 0, 600, 1, 1, "SpellIcons/Paladin/WordOfKingsCourage", 0, 0, 80, HEALTYPE.DIRECT_MULTI, false, new WordOfKingsCourage(), SPELL_TYPE.AOE_INDICATOR));
+        spellRepo.Add(SPELL.WORD_OF_KINGS_FAITH, new SpellInfo(SPELL.WORD_OF_KINGS_FAITH, "Word of Kings: Faith", 0, 0, 300, 2f, 60, 0, 1, 1, "SpellIcons/Paladin/wordOfKingsFaith", 60, 3, 50, HEALTYPE.PERIODIC_SINGLE, false, new WordOfKingsFaith(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.WORD_OF_KINGS_LOYALTY, new SpellInfo(SPELL.WORD_OF_KINGS_LOYALTY, "Word of Kings: Loyalty", 0, 0, 0, 0, 0, 3600, 4, 1, "SpellIcons/Paladin/WordOfKingsLoyalty", 3600, 1, 50, HEALTYPE.OTHER, false, new WordOfKingsLoyalty(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.WORD_OF_KINGS_LOYALTY_HEALING, new SpellInfo(SPELL.WORD_OF_KINGS_LOYALTY_HEALING, "WoKHealing", 0, 0, 0, 0, 0, 0, 0, 0, "SpellIcons/Paladin/Consecrate", 0, 0, 0, HEALTYPE.OTHER, false, new WoKL_Healing(), SPELL_TYPE.HIDDEN));
+        spellRepo.Add(SPELL.DIVINE_INTERVENTION, new SpellInfo(SPELL.DIVINE_INTERVENTION, "Divine Intervention", 0, 0, 0, 0, 0, 7200, 1, 1, "SpellIcons/Paladin/DivineIntervention", 900, 1, 0, HEALTYPE.OTHER, false, new DivineIntervention(), SPELL_TYPE.HIDDEN));
 
-        spellRepo.Add(SPELL.SOOTHING_VOID, new SpellInfo(SPELL.SOOTHING_VOID, "Soothing Void", 0, 0, 900, 10f, 0, 0, 1, 1, "SpellIcons/Shadowmancer/SoothingVoid", 180, 10, 20, HEALTYPE.PERIODIC_SINGLE, false, new SoothingVoid()));
-        spellRepo.Add(SPELL.SHADOWSURGE, new SpellInfo(SPELL.SHADOWSURGE, "Shadowsurge", 200, 1.5f, 0, 0, 0, 300, 1, 1, "SpellIcons/Shadowmancer/Shadowsurge", 0, 0, 30, HEALTYPE.DIRECT_MULTI, false, new Shadowsurge()));
-        spellRepo.Add(SPELL.TWILIGHT_BEAM, new SpellInfo(SPELL.TWILIGHT_BEAM, "Twilight Beam", 0, 0, 300, 2f, 0, 0, 1, 1, "SpellIcons/Shadowmancer/TwilightBeam", 12, 5, 50, HEALTYPE.PERIODIC_SINGLE, true, new TwilightBeam()));
-        spellRepo.Add(SPELL.SHADOWSONG, new SpellInfo(SPELL.SHADOWSONG, "Shadowsong", 220, 2.2f, 0, 0, 30, 0, 1, 1, "SpellIcons/Shadowmancer/Shadowsong", 0, 0, 25, HEALTYPE.DIRECT_MULTI, false, new Shadowsong()));
-        spellRepo.Add(SPELL.SACRIFICE, new SpellInfo(SPELL.SACRIFICE, "Sacrifice", 200, 1.5f, 0, 0, 0, 0, 1, 1, "SpellIcons/Shadowmancer/Sacrifice", 0, 0, 0, HEALTYPE.DIRECT_MULTI, false, new Sacrifice()));
-        spellRepo.Add(SPELL.SOOTHING_VOID_JUMP, new SpellInfo(SPELL.SOOTHING_VOID_JUMP, "Soothing Void: Jump", 120, 1.2f, 0, 0, 0, 0, 0, 0, "SpellIcons/Shadowmancer/TwilightBeam", 0, 0, 0, HEALTYPE.OTHER, false, new SoothingVoid()));
-        spellRepo.Add(SPELL.MOONLIGHT, new SpellInfo(SPELL.MOONLIGHT, "Moonlight", 0, 0, 0, 0, 0, 0, 0, 0, "SpellIcons/Shadowmancer/TwilightBeam", 0, 0, 0, HEALTYPE.OTHER, false, new Moonlight()));
+        spellRepo.Add(SPELL.SOOTHING_VOID, new SpellInfo(SPELL.SOOTHING_VOID, "Soothing Void", 0, 0, 900, 10f, 0, 0, 1, 1, "SpellIcons/Shadowmancer/SoothingVoid", 180, 10, 20, HEALTYPE.PERIODIC_SINGLE, false, new SoothingVoid(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.SHADOWSURGE, new SpellInfo(SPELL.SHADOWSURGE, "Shadowsurge", 200, 1.5f, 0, 0, 0, 300, 1, 1, "SpellIcons/Shadowmancer/Shadowsurge", 0, 0, 30, HEALTYPE.DIRECT_MULTI, false, new Shadowsurge(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.TWILIGHT_BEAM, new SpellInfo(SPELL.TWILIGHT_BEAM, "Twilight Beam", 0, 0, 300, 2f, 0, 0, 1, 1, "SpellIcons/Shadowmancer/TwilightBeam", 12, 5, 50, HEALTYPE.PERIODIC_SINGLE, true, new TwilightBeam(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.SHADOWSONG, new SpellInfo(SPELL.SHADOWSONG, "Shadowsong", 220, 2.2f, 0, 0, 30, 0, 1, 1, "SpellIcons/Shadowmancer/Shadowsong", 0, 0, 25, HEALTYPE.DIRECT_MULTI, false, new Shadowsong(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.SACRIFICE, new SpellInfo(SPELL.SACRIFICE, "Sacrifice", 200, 1.5f, 0, 0, 0, 0, 1, 1, "SpellIcons/Shadowmancer/Sacrifice", 0, 0, 0, HEALTYPE.DIRECT_MULTI, false, new Sacrifice(), SPELL_TYPE.NORMAL));
+        spellRepo.Add(SPELL.SOOTHING_VOID_JUMP, new SpellInfo(SPELL.SOOTHING_VOID_JUMP, "Soothing Void: Jump", 120, 1.2f, 0, 0, 0, 0, 0, 0, "SpellIcons/Shadowmancer/TwilightBeam", 0, 0, 0, HEALTYPE.OTHER, false, new SoothingVoid(), SPELL_TYPE.HIDDEN));
+        spellRepo.Add(SPELL.MOONLIGHT, new SpellInfo(SPELL.MOONLIGHT, "Moonlight", 0, 0, 0, 0, 0, 0, 0, 0, "SpellIcons/Shadowmancer/TwilightBeam", 0, 0, 0, HEALTYPE.OTHER, false, new Moonlight(), SPELL_TYPE.HIDDEN));
 
-        spellRepo.Add(SPELL.SCROLL_OF_ALAPHI, new SpellInfo(SPELL.SCROLL_OF_ALAPHI, "Scroll of Alaphi", 0, 0, 0, 0, 0, 0, 0, 0, "Items/CombatItems/ScrollOfAlaphi", 0, 0, 0, HEALTYPE.OTHER, false, new ScrollOfAlaphi()));
+        spellRepo.Add(SPELL.SCROLL_OF_ALAPHI, new SpellInfo(SPELL.SCROLL_OF_ALAPHI, "Scroll of Alaphi", 0, 0, 0, 0, 0, 0, 0, 0, "Items/CombatItems/ScrollOfAlaphi", 0, 0, 0, HEALTYPE.OTHER, false, new ScrollOfAlaphi(), SPELL_TYPE.HIDDEN));
     }
 }
 

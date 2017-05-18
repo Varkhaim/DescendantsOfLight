@@ -9,16 +9,6 @@ public class WordOfKingsFaith : SpellEffect
 
     public override void OnCast(Caster who, Soldier target)
     {
-        if (who.AuraActive(AURA.FLASH_OF_FUTURE))
-        {
-            if (Random.Range(0, 100) < VALUES.FLASH_OF_FUTURE_PROC2+who.AuraStacks(AURA.FLASH_OF_FUTURE))
-            {
-                GameCore.Core.buffSystem.BuffMe(CASTERBUFF.FLASH_OF_FUTURE_LIGHT, 900f, who);
-                GameObject _icon = GameCore.Core.FindSpellByName("Word of Kings: Light").myIcon;
-                _icon.GetComponent<scrSpellButton>().Animate(2f);
-            }
-        }
-
         target.CastFinished(this, who);
     }
 
@@ -30,11 +20,14 @@ public class WordOfKingsFaith : SpellEffect
     public override void Execute(Caster who, Soldier target, int val = 0)
     {
         SpellInfo spellInfo = GameCore.Core.spellRepository.Get(SPELL.WORD_OF_KINGS_FAITH);
-        int _dur = (int)(spellInfo.ticksCount * spellInfo.HoTgap / (1f+who.myAura[(int)AURA.EMPATHY].stacks*VALUES.EMPATHY_PERCENT2));
-        int _gap = (int)(spellInfo.HoTgap / (1f + who.myAura[(int)AURA.EMPATHY].stacks * VALUES.EMPATHY_PERCENT2));
-        if (who.myAura[(int)AURA.CONSECRATION].isActive)
-            GameCore.Core.buffSystem.BuffMe(CASTERBUFF.CONSECRATION, 600f, who);
-        target.BuffMe((int)Buff.DB.WORD_OF_KINGS_FAITH, _dur, who, spellInfo, _gap);
+        int _dur = spellInfo.ticksCount * spellInfo.HoTgap;
+        int _gap = spellInfo.HoTgap;
+    
+        target.BuffMe(BUFF.WORD_OF_KINGS_FAITH, _dur, who, spellInfo, _gap);
+        target.BuffMe(BUFF.FAITH, 900, who, spellInfo, 900);
+
+        GameCore.Core.paladinSparkHandler.AddSparks(1);
+
         if (!target.frame.GetComponent<AudioSource>().isPlaying)
             target.frame.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/WoKFaithSound"));
     }
